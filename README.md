@@ -38,11 +38,7 @@ $allowType = getConfig('upload', 'rule');
 $result = parent::upload($allowType, $savePath);
 ```
 
-# 邮件发送
 
-```
-https://github.com/swiftmailer/swiftmailer
-```
 
 # 数据加解密
 
@@ -63,23 +59,8 @@ echo $crypt_string . ' ' . $decrypt_string; // 1MxgJsgKZKXXhTE8msOKpA== 数据�
 // 此类还可以配合Java来进行加解密，具体链接可参考 http://www.cnblogs.com/yipu/articles/3871576.html
 ```
 
-# 日志记录
 
-```
 
-// 直接记录在以日期开头的文件里，如16_08_24.log
-Log_Log::info('this is a log', true, true);
-
-// 加上前缀，prefix_16_08_24.log
-Log_Log::info('this is a log', true, true, 'prefix');
-```
-
-# Request 操作
-
-```
-https://github.com/rmccue/Requests
-       
-```
 
 # 全局异常捕获
 
@@ -102,8 +83,6 @@ try {
 public function _initRoute(Yaf_Dispatcher $dispatcher)
 {
     $router = $dispatcher->getRouter();
-    
-    // http://yaf/login
     $router->addRoute('login', new Yaf_Route_Rewrite(
         '/login$',
         array(
@@ -113,4 +92,33 @@ public function _initRoute(Yaf_Dispatcher $dispatcher)
         )
     ));
 }
+```
+
+# 日志记录
+
+```
+
+// 直接记录在以日期开头的文件里，如16_08_24.log
+Log_Log::info('this is a log', true, true);
+
+// 加上前缀，prefix_16_08_24.log
+Log_Log::info('this is a log', true, true, 'prefix');
+```
+
+# 邮件发送
+
+```
+https://github.com/swiftmailer/swiftmailer
+```
+
+# Request 操作
+
+```
+https://github.com/rmccue/Requests
+       
+```
+# 参数验证
+
+```
+https://github.com/rakit/validation
 ```
