@@ -15,9 +15,9 @@
             "application/models",
             "application/library",
             "application/controllers",
-            "application/views",
-            "application/plugins",
-            "application/modules"
+            "application/modules",
+            "application/modules/Web/controllers",
+            "application/modules/Web/views"
         ]
     }
 }

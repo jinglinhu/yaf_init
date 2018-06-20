@@ -3,7 +3,7 @@
 /**
  * Class AbstractController
  */
-abstract class AbstractController extends Yaf\Controller_Abstract
+abstract class ApiAbstractController extends Yaf\Controller_Abstract
 {
     /**
      * 初始化
