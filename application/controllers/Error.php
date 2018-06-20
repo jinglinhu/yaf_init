@@ -18,7 +18,7 @@ class ErrorController extends Yaf\Controller_Abstract
         $exception = $this->getRequest()->getException();
 
         // 此处可扩展，当接口遇到错误并停止时，会写条日志的
-        Log_Log::info('error:' . $exception->getMessage() .'|file:'.$exception->getFile().'|line:'.$exception->getLine(), true, true, 'error_log');
+        Log_Log::info('error:' . $exception->getMessage() . '|file:' . $exception->getFile() . '|line:' . $exception->getLine(), true, true, 'error_log');
 
         if (isset($_GET['x'])) {
             echo "<pre>";

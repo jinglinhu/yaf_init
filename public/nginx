@@ -1,0 +1,23 @@
+server {
+    listen       80;
+    server_name  local.wallet.com;
+
+    root /Users/hujinglin/Desktop/workspace_github/yaf_init/public;
+
+    location /{
+        index index.php;
+        try_files $uri $uri/ /index.php?$query_string;
+   }
+
+   location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+   }
+
+    location ~ \.php$ {
+        include /usr/local/etc/nginx/fastcgi.conf;
+        fastcgi_intercept_errors on;
+        fastcgi_pass   127.0.0.1:9000;
+    }
+
+}

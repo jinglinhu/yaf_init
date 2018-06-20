@@ -11,7 +11,7 @@ define("APP_PATH",  realpath(dirname(__FILE__) . '/../'));
 // 视图目录
 define("VIEW_PATH", APP_PATH . '/application/views/');
 
-$app = new Yaf_Application(APP_PATH . "/conf/application.ini");
+$app = new Yaf\Application(APP_PATH . "/conf/application.ini");
 
 $request = [];
 foreach ($argv as $key => $value) {
@@ -21,4 +21,4 @@ foreach ($argv as $key => $value) {
     }
 }
 
-$app->bootstrap()->getDispatcher()->dispatch(new Yaf_Request_Simple());
+$app->bootstrap()->getDispatcher()->dispatch(new Yaf\Request_Simple());

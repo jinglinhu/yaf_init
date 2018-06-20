@@ -49,10 +49,10 @@ function redisConnect()
  * @param array $args 调用参数
  * @return object
  */
-function get_instance_of($name, $method='', $args=array())
+function get_instance_of($name, $method = '', $args = array())
 {
     static $_instance = array();
-    $identify = empty($args) ? $name . $method : $name . $method . to_guid_string($args);
+    $identify         = empty($args) ? $name . $method : $name . $method . to_guid_string($args);
     if (!isset($_instance[$identify])) {
         if (class_exists($name)) {
             $o = new $name();
@@ -62,12 +62,14 @@ function get_instance_of($name, $method='', $args=array())
                 } else {
                     $_instance[$identify] = $o->$method();
                 }
-            }
-            else
+            } else {
                 $_instance[$identify] = $o;
-        }
-        else
+            }
+
+        } else {
             halt('实例化一个不存在的类！' . ':' . $name);
+        }
+
     }
     return $_instance[$identify];
 }
@@ -100,7 +102,6 @@ function to_guid_string($mix)
     return md5($mix);
 }
 
-
 /**
  * 发送邮件
  * @param array $email
@@ -111,13 +112,14 @@ function to_guid_string($mix)
 function sendmail1($email, $title, $content)
 {
 
-    if (!is_array($email) || !$email)
+    if (!is_array($email) || !$email) {
         return false;
+    }
 
     set_time_limit(0);
     header("Content-type: text/html; charset=utf-8");
 
-    $title = "=?UTF-8?B?" . base64_encode($title) . "?=";
+    $title   = "=?UTF-8?B?" . base64_encode($title) . "?=";
     $headers = 'MIME-Version: 1.0' . "\r\n";
     $headers .= 'Content-type: text/html; charset=utf-8' . "\r\n"; // Additional headers
     $headers .= 'from:molaifeng@foxmail.com' . "\r\n";
@@ -146,10 +148,10 @@ function sendmail($data)
 
     require_once APP_PATH . "/application/library/Mail/PHPMailerAutoload.php";
 
-    $mail = new PHPMailer(true);
+    $mail   = new PHPMailer(true);
     $result = [
-        'status'    => 1,
-        'msg'       => '发送成功'
+        'status' => 1,
+        'msg'    => '发送成功',
     ];
 
     try {
@@ -178,8 +180,8 @@ function sendmail($data)
         $mail->send();
     } catch (Exception $e) {
         $result = [
-            'status'    => 0,
-            'msg'       => $mail->ErrorInfo
+            'status' => 0,
+            'msg'    => $mail->ErrorInfo,
         ];
         Log_Log::info("send mail failure:" . var_export($result, 1), 1, 1, 'mail_error');
     }
@@ -199,7 +201,7 @@ function auto_charset($fContents, $from, $to)
 {
 
     $from = strtoupper($from) == 'UTF8' ? 'utf-8' : $from;
-    $to = strtoupper($to) == 'UTF8' ? 'utf-8' : $to;
+    $to   = strtoupper($to) == 'UTF8' ? 'utf-8' : $to;
 
     if (strtoupper($from) === strtoupper($to) || empty($fContents) || (is_scalar($fContents) && !is_string($fContents))) {
 
@@ -217,14 +219,63 @@ function auto_charset($fContents, $from, $to)
         }
     } elseif (is_array($fContents)) {
         foreach ($fContents as $key => $val) {
-            $_key = auto_charset($key, $from, $to);
+            $_key             = auto_charset($key, $from, $to);
             $fContents[$_key] = auto_charset($val, $from, $to);
-            if ($key != $_key)
+            if ($key != $_key) {
                 unset($fContents[$key]);
+            }
+
         }
         return $fContents;
     } else {
         return $fContents;
+    }
+}
+
+/**
+ * 上传
+ * @param $allowType
+ * @param $savePath
+ * @param bool|false $thumb
+ * @param string $width
+ * @param string $height
+ * @param string $prefix
+ * @param string $maxSize
+ * @param bool|false $remove
+ * @return mixed
+ */
+function upload($allowType, $savePath, $thumb = false, $width = '', $height = '', $prefix = '', $maxSize = '', $remove = false)
+{
+
+    $upload = new Upload_Upload();
+
+    // 设置上传文件大小
+    $upload->maxSize = empty($maxSize) ? getConfig('upload', 'max_size') : $maxSize;
+
+    if ($thumb) {
+        $upload->thumb             = $thumb;
+        $upload->thumbPrefix       = $prefix;
+        $upload->thumbMaxWidth     = $width;
+        $upload->thumbMaxHeight    = $height;
+        $upload->thumbRemoveOrigin = $remove;
+    }
+
+    // 设置上传文件类型
+    $upload->allowExts = $allowType;
+
+    // 设置附件上传目录
+    $upload->savePath = $savePath;
+
+    // 设置上传文件规则
+    $upload->saveRule = 'uniqid';
+
+    if (!$upload->upload()) {
+        return ['status' => 0, 'msg' => $upload->getErrorMsg()];
+    } else {
+
+        // 取得成功上传的文件信息
+        $info = $upload->getUploadFileInfo();
+        return ['status' => 1, 'msg' => $info[0]['savename']];
     }
 }
 
@@ -273,10 +324,11 @@ function getValueByField($array = array(), $field = 'id')
  *
  * @return array $result 获取的数据
  */
-function getDataByArray($table, $tableField, $array, $arrayField, $getField = [], $connection = '') {
+function getDataByArray($table, $tableField, $array, $arrayField, $getField = [], $connection = '')
+{
     $result = empty($connection) ?
-        DB::table($table)->select($getField)->whereIn($tableField, getValueByField($array, $arrayField))->get() :
-        DB::connection($connection)->table($table)->select($getField)->whereIn($tableField, getValueByField($array, $arrayField))->get();
+    DB::table($table)->select($getField)->whereIn($tableField, getValueByField($array, $arrayField))->get() :
+    DB::connection($connection)->table($table)->select($getField)->whereIn($tableField, getValueByField($array, $arrayField))->get();
     return setArrayByField($result, $tableField);
 }
 
@@ -289,11 +341,11 @@ function get_client_ip()
     $IP = '';
     if (getenv('HTTP_CLIENT_IP') && strcasecmp(getenv('HTTP_CLIENT_IP'), 'unknown')) {
         $IP = getenv('HTTP_CLIENT_IP');
-    } elseif(getenv('HTTP_X_FORWARDED_FOR') && strcasecmp(getenv('HTTP_X_FORWARDED_FOR'), 'unknown')) {
+    } elseif (getenv('HTTP_X_FORWARDED_FOR') && strcasecmp(getenv('HTTP_X_FORWARDED_FOR'), 'unknown')) {
         $IP = getenv('HTTP_X_FORWARDED_FOR');
-    } elseif(getenv('REMOTE_ADDR') && strcasecmp(getenv('REMOTE_ADDR'), 'unknown')) {
+    } elseif (getenv('REMOTE_ADDR') && strcasecmp(getenv('REMOTE_ADDR'), 'unknown')) {
         $IP = getenv('REMOTE_ADDR');
-    } elseif(isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], 'unknown')) {
+    } elseif (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], 'unknown')) {
         $IP = $_SERVER['REMOTE_ADDR'];
     }
     return $IP ? $IP : "unknow";

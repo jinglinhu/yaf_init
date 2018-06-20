@@ -17,7 +17,8 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract
         Yaf\Loader::getInstance()->registerLocalNameSpace(array('Log', 'Cache', 'Upload', 'Http', 'Util'));
     }
 
-    public function onError($severity, $message, $file, $line) {
+    public function onError($severity, $message, $file, $line)
+    {
         throw new ErrorException($message, $severity, $severity, $file, $line);
     }
 
@@ -41,8 +42,8 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract
 
         // another业务链接
         // $capsule->addConnection(Yaf_Application::app()->getConfig()->another->toArray(), 'another');
-        //$capsule::connection('another')->enableQueryLog();
-        
+        // $capsule::connection('another')->enableQueryLog();
+
         // 设置全局静态可访问
         $capsule->setAsGlobal();
 
@@ -53,26 +54,13 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract
     public function _initRoute(Yaf\Dispatcher $dispatcher)
     {
         $router = $dispatcher->getRouter();
+
         $router->addRoute('login', new Yaf\Route\Rewrite(
             '/login$',
             array(
-                'module'         => 'Index', // 默认的模块可以省略
-                'controller'    => 'Public',
-                'action'        => 'login'
-            )
-        ));
-        $router->addRoute('logout', new Yaf\Route\Rewrite(
-            '/logout$',
-            array(
-                'controller'    => 'Public',
-                'action'        => 'logout'
-            )
-        ));
-        $router->addRoute('404', new Yaf\Route\Rewrite(
-            '/404$',
-            array(
-                'controller'    => 'Public',
-                'action'        => 'unknow'
+                'module'     => 'Index', // 默认的模块可以省略
+                'controller' => 'Public',
+                'action'     => 'login',
             )
         ));
     }
@@ -113,8 +101,10 @@ TYPEOTHER;
             $this->log(Capsule::getQueryLog(), 'DEFAULT');
 
             // 业务库相关SQL
-            if (defined('ANOTHER'))
+            if (defined('ANOTHER')) {
                 $this->log(Capsule::connection(ANOTHER)->getQueryLog(), 'ANOTHER');
+            }
+
         }
 
     }
