@@ -2,7 +2,6 @@
 ![Supported PHP versions: >=5.4](https://img.shields.io/badge/PHP-%3E%3D5.4-blue.svg)
 ![Supported Yaf versions: >=1.8.0](https://img.shields.io/badge/Yaf-%3E%3D2.3.2-orange.svg)
 ![Supported Eloquent versions: 5.0](https://img.shields.io/badge/Eloquent-%205.0-green.svg)
-![License](https://img.shields.io/badge/license-Apache%202-yellow.svg)
 
 # Session由默认的文件改为Redis存储
 
@@ -20,23 +19,18 @@ public function _initSession()
 }
 ```
 
-# 多个数据库链接操作如下
-
+# 配置获取
 ```
-
-// 默认的
-DB::table('tb_name')->get()
-
-// another
-DB::connection('another')->get();
+// 上传目录
+$return_string = Util_Conf::get('db.redis.port');
+$return_array = Util_Conf::get('db.redis');
 
 ```
 
 # 文件上传
-
 ```
 // 上传目录
-$savePath = getConfig('upload', 'path');
+$savePath = Ut('upload', 'path');
 
 // 允许的规则
 $allowType = getConfig('upload', 'rule');
@@ -47,28 +41,15 @@ $result = parent::upload($allowType, $savePath);
 # 邮件发送
 
 ```
-
-# 首先安装sendmail模块
-yum -y install sendmail  
-/etc/rc.d/init.d/sendmail start
-
-// 发送邮件，可群发
-sendmail([
-    'to'        => [], // 邮件发送人列表
-    'cc'        => [], // 邮件抄送人列表
-    'subject'   => '', // 邮件主题
-    'content'   => '', // 邮件正文
-    'attachment'=> []  // 附件列表
-]);
+https://github.com/swiftmailer/swiftmailer
 ```
 
 # 数据加解密
 
 ```
-
 $string = '数据加解密';
 $crypt = new Util_CryptAES();
-$crypt->set_key(getConfig('CryptAES', 'key'));
+$crypt->set_key(Util_Conf::('setting.CryptAES'));
 $crypt->require_pkcs5();
 
 // 加密
@@ -93,24 +74,11 @@ Log_Log::info('this is a log', true, true);
 Log_Log::info('this is a log', true, true, 'prefix');
 ```
 
-# Curl 操作
+# Request 操作
 
 ```
-
-$curl = new \Http\Curl();
-
-// get
-$curl->get('https://www.example.com/search', array(
-    'q' => 'keyword',
-));
-
-// post
-$curl->post('https://www.example.com/login/', array(
-    'username' => 'myusername',
-    'password' => 'mypassword',
-));
-
-// more https://github.com/php-curl-class/php-curl-class
+https://github.com/rmccue/Requests
+       
 ```
 
 # 全局异常捕获
@@ -142,24 +110,6 @@ public function _initRoute(Yaf_Dispatcher $dispatcher)
             'module'         => 'Index', // 默认的模块可以省略
             'controller'    => 'Public',
             'action'        => 'login'
-        )
-    ));
-    
-    // http://yaf/logout
-    $router->addRoute('logout', new Yaf_Route_Rewrite(
-        '/logout$',
-        array(
-            'controller'    => 'Public',
-            'action'        => 'logout'
-        )
-    ));
-    
-    // http://yaf/404
-    $router->addRoute('404', new Yaf_Route_Rewrite(
-        '/404$',
-        array(
-            'controller'    => 'Public',
-            'action'        => 'unknow'
         )
     ));
 }
