@@ -4,25 +4,21 @@ class Util_Conf {
 
     private static $delimiter = '.';
 
-    public static function getConf($key) {
+    public static function get($key) {
         if (strpos($key, '.') !== false) {
             list($file, $path) = explode('.', $key, 2);
         } else {
             $file = $key;
         }
 
-       
-        $config_file = APPLICATION_PATH . '/conf/' . $file . '.ini';
+        $config_file = APP_PATH . '/conf/' . $file . '.ini';
         
         if (!file_exists($config_file)) {
             return false;
         }
 
-        if(defined('ENVIRON')){
-            $env = ENVIRON;
-        }else{
-            $env = "develop";
-        }
+        $env = ini_get('yaf.environ');
+
         if (!isset(self::$files[$file][$env])) {
             self::$files[$file][$env] = new \Yaf\Config\Ini($config_file, $env);
         }

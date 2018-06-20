@@ -4,30 +4,31 @@
  */
 class Cache_Driver_Redis extends Cache_Cache
 {
-	 /**
-	 * 架构函数
+    /**
+     * 架构函数
      * @param array $options 缓存参数
      * @access public
      */
-    public function __construct($options=array()) {
-        if ( !extension_loaded('redis') ) {
-            throwException('不支持'.':redis');
+    public function __construct($options = array())
+    {
+        if (!extension_loaded('redis')) {
+            throwException('不支持' . ':redis');
         }
         $options = array_merge(
-            array (
-                'host'          => getConfig('redis', 'host') ? getConfig('redis', 'host') : '127.0.0.1',
-                'port'          => getConfig('redis', 'port') ? getConfig('redis', 'port') : 6379,
-                'timeout'       => getConfig('redis', 'timeout') ? getConfig('redis','timeout') : false,
-                'persistent'    => false,
+            array(
+                'host'       => Util_Conf::get('db.redis.host') ? Util_Conf::get('db.redis.host') : '127.0.0.1',
+                'port'       => Util_Conf::get('db.redis.port') ? Util_Conf::get('db.redis.port') : 6379,
+                'timeout'    => Util_Conf::get('db.redis.timeout') ? Util_Conf::get('db.redis.timeout') : false,
+                'persistent' => false,
             ),
             $options
         );
-        $this->options =  $options;
-        $this->options['expire'] =  isset($options['expire'])?  $options['expire']  :   getConfig('cache', 'expire');
-        $this->options['prefix'] =  isset($options['prefix'])?  $options['prefix']  :   getConfig('cache', 'prefix');
-        $this->options['length'] =  isset($options['length'])?  $options['length']  :   0;        
-        $func = $options['persistent'] ? 'pconnect' : 'connect';
-        $this->handler  = new Redis;
+        $this->options           = $options;
+        $this->options['expire'] = isset($options['expire']) ? $options['expire'] : Util_Conf::get('db.cache.expire');
+        $this->options['prefix'] = isset($options['prefix']) ? $options['prefix'] : Util_Conf::get('db.cache.prefix');
+        $this->options['length'] = isset($options['length']) ? $options['length'] : 0;
+        $func                    = $options['persistent'] ? 'pconnect' : 'connect';
+        $this->handler           = new Redis;
         $options['timeout'] === false ?
         $this->handler->$func($options['host'], $options['port']) :
         $this->handler->$func($options['host'], $options['port'], $options['timeout']);
@@ -40,10 +41,11 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param int $flag 是否返回object值，1是0否
      * @return mixed
      */
-    public function get($name,$flag=1) {
-        $value = $this->handler->get($this->options['prefix'] . $name);
-        $jsonData  = ($flag==1)?json_decode( $value):$value;
-        return ($jsonData === NULL) ? $value : $jsonData;	//检测是否为JSON数据 true 返回JSON解析数组, false返回源数据
+    public function get($name, $flag = 1)
+    {
+        $value    = $this->handler->get($this->options['prefix'] . $name);
+        $jsonData = ($flag == 1) ? json_decode($value) : $value;
+        return ($jsonData === null) ? $value : $jsonData; //检测是否为JSON数据 true 返回JSON解析数组, false返回源数据
     }
 
     /**
@@ -54,17 +56,17 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param integer $expire  有效时间（秒）
      * @return boolen
      */
-    public function set($name, $value, $expire = null) {
-        $name   =   $this->options['prefix'].$name;
+    public function set($name, $value, $expire = null)
+    {
+        $name = $this->options['prefix'] . $name;
         //对数组/对象数据进行缓存处理，保证数据完整性
-        $value  =  (is_object($value) || is_array($value)) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
+        $value  = (is_object($value) || is_array($value)) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
         $result = $this->handler->set($name, $value);
         if ($expire) {
             $this->expire($name, $expire);
         }
         return $result;
     }
-
 
     /**
      * 读取缓存 hash类型
@@ -73,10 +75,11 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param string $field 存储数据
      * @return mixed
      */
-    public function hget($tablename, $field) {
-        $value = $this->handler->hGet($this->options['prefix'] . $tablename, $field);
-        $jsonData  = json_decode( $value);
-        return ($jsonData === NULL) ? $value : $jsonData;	//检测是否为JSON数据 true 返回JSON解析数组, false返回源数据
+    public function hget($tablename, $field)
+    {
+        $value    = $this->handler->hGet($this->options['prefix'] . $tablename, $field);
+        $jsonData = json_decode($value);
+        return ($jsonData === null) ? $value : $jsonData; //检测是否为JSON数据 true 返回JSON解析数组, false返回源数据
     }
 
     /**
@@ -85,7 +88,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param string $tablename 缓存变量名
      * @return mixed
      */
-    public function hgetall($tablename) {
+    public function hgetall($tablename)
+    {
         $value = $this->handler->hGetAll($this->options['prefix'] . $tablename);
         return $value;
     }
@@ -98,13 +102,16 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param mixed $expire  过期时间
      * @return bool
      */
-    public function hmset($tablename, $field, $expire = null) {
+    public function hmset($tablename, $field, $expire = null)
+    {
         foreach ($field as $k => &$v) {
             $v = (is_object($v) || is_array($v)) ? json_encode($v, JSON_UNESCAPED_UNICODE) : $v;
         }
         $result = $this->handler->hMset($tablename, $field);
-        if ($expire != null)
+        if ($expire != null) {
             $this->expire($tablename, $expire);
+        }
+
         return $result;
     }
 
@@ -117,12 +124,15 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param mixed $expire  过期时间
      * @return bool
      */
-    public function hset($tablename, $field, $value, $expire = null) {
+    public function hset($tablename, $field, $value, $expire = null)
+    {
         $name   = $this->options['prefix'] . $tablename;
         $value  = (is_object($value) || is_array($value)) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
         $result = $this->handler->hSet($name, $field, $value);
-        if ($expire != null)
+        if ($expire != null) {
             $this->expire($tablename, $expire);
+        }
+
         return $result;
     }
 
@@ -133,7 +143,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param  int $expire
      * @return bool
      */
-    public function expire($key, $expire) {
+    public function expire($key, $expire)
+    {
         return $this->handler->expire($key, $expire);
     }
 
@@ -143,7 +154,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param  string $key
      * @return bool
      */
-    public function ttl($key) {
+    public function ttl($key)
+    {
         return $this->handler->ttl($key);
     }
 
@@ -153,7 +165,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param  int $key
      * @return bool
      */
-    public function exists($key) {
+    public function exists($key)
+    {
         return $this->handler->exists($key);
     }
 
@@ -163,7 +176,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param string $name 缓存变量名
      * @return boolen
      */
-    public function delete($name) {
+    public function delete($name)
+    {
         return $this->handler->delete($this->options['prefix'] . $name);
     }
 
@@ -172,7 +186,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @access public
      * @return mixed
      */
-    public function info() {
+    public function info()
+    {
         return $this->handler->info();
     }
 
@@ -183,7 +198,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param mixed $field  存储数据
      * @return mixed
      */
-    public function lpush($queue, $field) {
+    public function lpush($queue, $field)
+    {
         return $this->handler->lpush($queue, $field);
     }
 
@@ -193,7 +209,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param string $queue 队列名
      * @return mixed
      */
-    public function lpop($queue) {
+    public function lpop($queue)
+    {
         return $this->handler->lpop($queue);
     }
 
@@ -203,7 +220,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param string $queue 队列名
      * @return mixed
      */
-    public function rpop($queue) {
+    public function rpop($queue)
+    {
         return $this->handler->rpop($queue);
     }
 
@@ -215,7 +233,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @param string $stop 结束
      * @return mixed
      */
-    public function lrange($queue, $start, $stop) {
+    public function lrange($queue, $start, $stop)
+    {
         return $this->handler->lrange($queue, $start, $stop);
     }
 
@@ -224,7 +243,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @access public
      * @return boolen
      */
-    public function close() {
+    public function close()
+    {
         return $this->handler->close();
     }
 
@@ -233,7 +253,8 @@ class Cache_Driver_Redis extends Cache_Cache
      * @access public
      * @return boolen
      */
-    public function clear() {
+    public function clear()
+    {
         return $this->handler->flushDB();
     }
 

@@ -14,18 +14,12 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract
         Yaf\Loader::import(APP_PATH . "/application/function.php");
 
         // 注册本地类名前缀, 这部分类名将会在本地类库查找
-        Yaf\Loader::getInstance()->registerLocalNameSpace(array('Log', 'Cache', 'Upload', 'Http', 'Util'));
+        Yaf\Loader::getInstance()->registerLocalNameSpace(array('Log', 'Cache', 'Upload', 'Util'));
     }
 
     public function onError($severity, $message, $file, $line)
     {
         throw new ErrorException($message, $severity, $severity, $file, $line);
-    }
-
-    public function _initConfig()
-    {
-        $config = Yaf\Application::app()->getConfig();
-        Yaf\Registry::set('config', $config);
     }
 
     public function _initDefaultName(Yaf\Dispatcher $dispatcher)
@@ -38,7 +32,7 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract
         $capsule = new Capsule;
 
         // 创建默认链接
-        $capsule->addConnection(Yaf\Application::app()->getConfig()->db_wallet->toArray());
+        $capsule->addConnection(Util_Conf::get('db.wallet'));
 
         // another业务链接
         // $capsule->addConnection(Yaf_Application::app()->getConfig()->another->toArray(), 'another');

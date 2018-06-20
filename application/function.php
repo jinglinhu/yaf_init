@@ -1,45 +1,8 @@
 <?php
 
-use Illuminate\Database\Capsule\Manager as DB;
-
-/**
- * 打印数组
- * @param $data
- */
-function p($data)
-{
-    echo '<pre>';
-    print_r($data);
-    echo '</pre>';
-}
-
-/**
- * 获取配置文件信息
- * @param $field
- * @param null $key
- * @return mixed
- */
-function getConfig($field, $key = null)
-{
-    $data = Yaf\Registry::get('config')->toArray();
-    return $key ? $data[$field][$key] : $data[$field];
-}
-
-/**
- * 获取log路径
- * @return mixed
- */
-function getLogPath()
-{
-    return getConfig('log', 'path');
-}
-
-/**
- * 连接redis
- */
 function redisConnect()
 {
-    return Cache_Cache::getInstance('Redis', ['host' => getConfig('redis', 'host'), 'port' => getConfig('redis', 'port')]);
+    return Cache_Cache::getInstance('Redis', ['host' => Util_Conf::get('db.redis.host'), 'port' => Util_Conf::get('db.redis.host')]);
 }
 
 /**
@@ -313,24 +276,6 @@ function getValueByField($array = array(), $field = 'id')
     return $result;
 }
 
-/**
- * 通过关联数组获取数据
- * @param string $table 表名
- * @param string $tableField 表字段
- * @param array $array 数组
- * @param string $arrayField 数组的字段
- * @param array $getField 要获取的字段 此字段也可以是 *
- * @param string $connection 数据库连接
- *
- * @return array $result 获取的数据
- */
-function getDataByArray($table, $tableField, $array, $arrayField, $getField = [], $connection = '')
-{
-    $result = empty($connection) ?
-    DB::table($table)->select($getField)->whereIn($tableField, getValueByField($array, $arrayField))->get() :
-    DB::connection($connection)->table($table)->select($getField)->whereIn($tableField, getValueByField($array, $arrayField))->get();
-    return setArrayByField($result, $tableField);
-}
 
 /**
  * 获取用户IP
