@@ -6,16 +6,15 @@
         "symfony/var-dumper": "2.6.*",
         "swiftmailer/swiftmailer":"^6.0",
         "rakit/validation": "0.12.*",
-        "rmccue/requests": "dev-master"
+        "rmccue/requests": "dev-master",
+        "sc0vu/web3.php": "dev-master"
     },
-
     "autoload" : {
         "App\\Models\\": "application/models",
         "classmap": [
             "application/models",
             "application/library",
-            "application/controllers",
-            "application/modules"
+            "application/controllers"
         ]
     }
 }
