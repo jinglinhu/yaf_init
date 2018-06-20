@@ -27,11 +27,20 @@ class ErrorController extends Yaf\Controller_Abstract
         }
 
         // 加载失败
-        if ($exception instanceof Yaf\Exception_LoadFailed) {
+        if ($exception instanceof Yaf\Exception\LoadFailed) {
             $this->redirect('/404');return;
 
             // 其他错误
         } else {
         }
     }
+    
+    /**
+     * 404 not found
+     */
+    public function unknowAction()
+    {
+        die('Oops,你访问的页面不存在!');
+    }
+
 }

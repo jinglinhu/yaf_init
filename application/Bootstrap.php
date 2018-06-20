@@ -57,25 +57,19 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract
                 'action'     => 'login',
             )
         ));
-    }
+        $router->addRoute('404', new Yaf\Route\Rewrite(
+            '/404$',
+            array(
+                'controller'    => 'Error',
+                'action'        => 'unknow'
+            )
+        ));
 
-    public function _initSession()
-    {
-        try {
-            $redis = redisConnect();
-            $redis->ping();
-            $session = new Util_Session();
-            session_set_save_handler($session, true);
-        } catch (Exception $e) {
-            Log_Log::info('[Bootstrap] session init error:' . $e->getMessage(), true, true);
-        }
     }
 
     public function cleanup()
     {
-
         restore_error_handler();
-
         // 捕获fatal error
         $e = error_get_last();
         if ($e['type'] == E_ERROR) {

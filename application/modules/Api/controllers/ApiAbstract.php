@@ -10,7 +10,8 @@ abstract class ApiAbstractController extends Yaf\Controller_Abstract
      */
     public function init()
     {
-        header("Content-Type:text/html;charset=utf-8");
+    	header("Content-Type:text/html;charset=utf-8");
+    	Yaf\Dispatcher::getInstance()->disableView();
     }
 
 }
