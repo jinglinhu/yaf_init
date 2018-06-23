@@ -4,7 +4,7 @@
 ```
     brew install nginx
     sudo nginx 
-    sudo nginx -s stop|restart
+    sudo nginx -s stop|reload
 
     vim /usr/local/etc/nginx/conf.d/xxx.conf
 
