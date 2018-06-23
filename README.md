@@ -1,23 +1,52 @@
  yaf + composer
 
-![Supported PHP versions: >=5.4](https://img.shields.io/badge/PHP-%3E%3D5.4-blue.svg)
-![Supported Yaf versions: >=1.8.0](https://img.shields.io/badge/Yaf-%3E%3D2.3.2-orange.svg)
-![Supported Eloquent versions: 5.0](https://img.shields.io/badge/Eloquent-%205.0-green.svg)
-
-# Session由默认的文件改为Redis存储
-
+# mac本地环境搭建：
 ```
-public function _initSession()
-{
-    try {
-        $redis = redisConnect();
-        $redis->ping();
-        $session = new Util_Session();
-        session_set_save_handler($session, true);
-    } catch (Exception $e) {
-        Log_Log::info('[Bootstrap] session init error:' . $e->getMessage(), true, true);
-    }
-}
+    brew install nginx
+    sudo nginx 
+    sudo nginx -s stop|restart
+
+    vim /usr/local/etc/nginx/conf.d/xxx.conf
+
+    server {
+            listen       80;
+            server_name  local.xxxxx.com;
+            root /code_dir/public;
+            location /{
+                index index.php;
+                try_files $uri $uri/ /index.php?$query_string;
+           }
+           location = /favicon.ico {
+                log_not_found off;
+                access_log off;
+           }
+            location ~ \.php$ {
+                include /usr/local/etc/nginx/fastcgi.conf;
+                fastcgi_intercept_errors on;
+                fastcgi_pass   127.0.0.1:9000;
+            }
+
+        }
+
+    brew install php71 \
+    --without-snmp \
+    --without-apache \
+    --with-debug \
+    --with-fpm \
+    --with-intl \
+    --with-homebrew-curl \
+    --with-homebrew-libxslt \
+    --with-homebrew-openssl \
+    --with-imap \
+    --with-mysql \
+    --with-tidy
+
+    /usr/local/Cellar/php\@7.1/7.1.18/bin/pecl install yaf
+
+    brew services start|stop|restart
+
+
+    进入目录下 composer install
 ```
 
 # 配置获取
@@ -31,7 +60,7 @@ $return_array = Util_Conf::get('db.redis');
 # 文件上传
 ```
 // 上传目录
-$savePath = Ut('upload', 'path');
+$savePath = Util_Upload('upload', 'path');
 
 // 允许的规则
 $allowType = getConfig('upload', 'rule');
@@ -60,23 +89,6 @@ echo $crypt_string . ' ' . $decrypt_string; // 1MxgJsgKZKXXhTE8msOKpA== 数据�
 // 此类还可以配合Java来进行加解密，具体链接可参考 http://www.cnblogs.com/yipu/articles/3871576.html
 ```
 
-
-
-
-# 全局异常捕获
-
-```
-
-try {
-    if ($_POST['test']) {
-    
-    }
-} catch (Exception $e) {
-    echo $e->getMessage(); // Undefined index: test
-}
-
-
-```
 
 # URL 重写
 
